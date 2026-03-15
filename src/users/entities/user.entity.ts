@@ -9,17 +9,17 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column()
+  @Column({ select: false })
   password: string;
 
   @Column()
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   bio: string;
 
-  @Column()
-  profileImage : string;
+  @Column({ nullable: true })
+  profileImage: string;
 
   @Column()
   createdAt: Date;
