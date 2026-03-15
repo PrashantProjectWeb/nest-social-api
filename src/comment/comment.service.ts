@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Post } from '../post/entities/post.entities';
 import { Comment } from '../comment/entities/commententities';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -13,6 +14,7 @@ export class CommentService {
         private postRepo: Repository<Post>,
         @InjectRepository(Comment)
         private commentRepo: Repository<Comment>,
+        private eventEmitter: EventEmitter2,
     ) {}
 
   async getCommentByPost(postId: number) {
@@ -36,7 +38,9 @@ export class CommentService {
       user: { id: userId },
       post: { id: createCommentDto.postId },
     });
-    return await this.commentRepo.save(comment);
+    const savedComment = await this.commentRepo.save(comment);
+    this.eventEmitter.emit('post.commented', { senderId: userId, postId: createCommentDto.postId });
+    return savedComment;
   }
 
   async updateComment(userId: number, id: number, updateCommentDto: UpdateCommentDto) {

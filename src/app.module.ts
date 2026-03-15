@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { BullModule } from '@nestjs/bull';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { PostModule } from './post/post.module';
@@ -9,7 +11,7 @@ import { LikeModule } from './like/like.module';
 import { CommentModule } from './comment/comment.module';
 import { FollowerModule } from './follower/follower.module';
 import { FeedModule } from './feed/feed.module';
-
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -23,6 +25,13 @@ import { FeedModule } from './feed/feed.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    EventEmitterModule.forRoot(),
+    BullModule.forRoot({
+      redis: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: Number(process.env.REDIS_PORT) || 6379,
+      },
+    }),
     UsersModule,
     AuthModule,
     PostModule,
@@ -30,6 +39,7 @@ import { FeedModule } from './feed/feed.module';
     CommentModule,
     FollowerModule,
     FeedModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

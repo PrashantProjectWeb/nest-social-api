@@ -1,6 +1,7 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Follower } from './entities/follower.entities';
 import { User } from '../users/entities/user.entity';
 
@@ -11,6 +12,7 @@ export class FollowerService {
     private followerRepo: Repository<Follower>,
     @InjectRepository(User)
     private userRepo: Repository<User>,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async follow(followerId: number, followingId: number) {
@@ -32,6 +34,7 @@ export class FollowerService {
       following: { id: followingId },
     });
     await this.followerRepo.save(follow);
+    this.eventEmitter.emit('user.followed', { senderId: followerId, receiverId: followingId });
     return { message: 'Followed successfully' };
   }
 
