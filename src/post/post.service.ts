@@ -16,8 +16,23 @@ export class PostService {
     return this.postRepo.save(post);
   }
 
-  async getPosts() {
-    return this.postRepo.find({ relations: ['user'], order: { createdAt: 'DESC' } });
+  async getPosts(page: number = 1, limit: number = 10) {
+    const [data, total] = await this.postRepo
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.user', 'user')
+      .loadRelationCountAndMap('post.likeCount', 'post.likes')
+      .loadRelationCountAndMap('post.commentCount', 'post.comments')
+      .orderBy('post.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async getPost(postId: number) {

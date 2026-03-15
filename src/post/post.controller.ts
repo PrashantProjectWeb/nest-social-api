@@ -1,4 +1,4 @@
-import { Controller , UseGuards, Post, Body, HttpCode, Req, Get, Param} from '@nestjs/common';
+import { Controller , UseGuards, Post, Body, HttpCode, Req, Get, Param, Query} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PostService } from '../post/post.service';
 import { CreatePostDto } from '../post/dto/create-post.dto';
@@ -18,8 +18,11 @@ export class PostController {
 
     @Get()
     @HttpCode(200)
-    async getPosts(@Req() req){
-       return this.postService.getPosts();
+    async getPosts(
+      @Query('page') page: string = '1',
+      @Query('limit') limit: string = '10',
+    ) {
+       return this.postService.getPosts(Number(page), Number(limit));
     }
 
     @Get(':id')
@@ -28,7 +31,7 @@ export class PostController {
         return this.postService.getPost(Number(id));    
     }
 
-    @Get()
+    @Get('my-posts')
     @HttpCode(200)
     async getPostsByUser(@Req() req){
        return this.postService.getPostsByUser(req.user.id);
