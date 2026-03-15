@@ -7,6 +7,8 @@ import { AuthModule } from './auth/auth.module';
 import { PostModule } from './post/post.module';
 import { LikeModule } from './like/like.module';
 import { CommentModule } from './comment/comment.module';
+import { FollowModule } from './follow/follow.module';
+import { FollowerModule } from './follower/follower.module';
 
 
 @Module({
@@ -25,7 +27,9 @@ import { CommentModule } from './comment/comment.module';
     AuthModule,
     PostModule,
     LikeModule,
-    CommentModule
+    CommentModule,
+    FollowModule,
+    FollowerModule
   ],
   controllers: [AppController],
   providers: [AppService],
